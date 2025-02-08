@@ -2,7 +2,7 @@
 
 import { getCompanyPlaceId } from "@/lib/getCompanyPlaceId";
 import { getPlaceInfos } from "@/lib/getCompanyInfos";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 export default function Home() {
   const [companyInput, setCompanyInput] = useState<string>("");
@@ -10,15 +10,20 @@ export default function Home() {
   const [placeId, setPlaceId] = useState<string | null>(null);
   const [placeInfo, setPlaceInfo] = useState<any>(null);
 
+  const [errors, setErrors] = useState<Record<string, string>>({});
+
   // Fetch place ID
   const handleGetPlaceId = async () => {
-    const result = await getCompanyPlaceId(companyInput, countryInput);
+    setErrors({});
+    const result = await getCompanyPlaceId(
+      companyInput,
+      countryInput,
+      setErrors
+    );
 
-    console.log("RESULT", result);
+    const id = result?.results[0].place_id;
 
-    if (result) {
-      setPlaceId(result.placeId || "No place ID found");
-    }
+    if (result) setPlaceId(id || "No place ID found");
   };
 
   const handleGetPlaceInfo = async () => {
@@ -42,6 +47,35 @@ export default function Home() {
           value={companyInput}
           onChange={(e) => setCompanyInput(e.target.value)}
         />
+
+        {/* Display error for companyName */}
+        {errors.companyName && (
+          <div style={{ color: "red" }}>
+            <p>{errors.companyName}</p>
+          </div>
+        )}
+
+        <label htmlFor="country">Country</label>
+        <input
+          type="text"
+          name="country"
+          value={countryInput}
+          onChange={(e) => setCountryInput(e.target.value)}
+        />
+
+        {/* Display error for country */}
+        {errors.country && (
+          <div style={{ color: "red" }}>
+            <p>{errors.country}</p>
+          </div>
+        )}
+
+        {/* Display global error if any */}
+        {errors.global && (
+          <div style={{ color: "red" }}>
+            <p>{errors.global}</p>
+          </div>
+        )}
 
         <button
           className="bg-blue-300 py-2 px-6 rounded-md"

@@ -1,5 +1,3 @@
-const key = process.env.NEXT_PUBLIC_API_KEY;
-
 interface CompanyPlaceId {
   companyName?: string;
   country?: string;
@@ -8,34 +6,40 @@ interface CompanyPlaceId {
 
 export async function getCompanyPlaceId(
   companyName: string,
-  country: string
+  country: string,
+  setErrors: React.Dispatch<React.SetStateAction<Record<string, string>>>
 ): Promise<CompanyPlaceId | null> {
-  if (!key) {
-    console.log("API KEY is missing");
+  const errors: Record<string, string> = {};
+
+  if (!companyName.trim()) errors.companyName = "Invalid companyName input";
+
+  if (!country.trim()) errors.country = "Invalid country input";
+
+  if (Object.keys(errors).length > 0) {
+    setErrors(errors); // Set errors in the state
     return null;
   }
 
-  const encodedAddress = encodeURIComponent(companyName);
-  const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodedAddress}&components=country:${country}&key=${key}`;
-
   try {
-    const res = await fetch(url);
-    const data = await res.json();
+    const encodedCompanyName = encodeURIComponent(companyName);
+    const encodedCountry = encodeURIComponent(country);
 
-    console.log("data", data);
+    const response = await fetch(
+      `/api/placeId?companyName=${encodedCompanyName}&country=${encodedCountry}`
+    );
 
-    if (data.status === "OK" && data.results.length > 0) {
-      return {
-        companyName,
-        country,
-        placeId: data.results[0].place_id,
-      };
-    } else {
-      console.warn("No results found or API error:", data.status);
-      return null;
+    if (!response.ok) {
+      setErrors({ global: `Error fetching place ID: ${response.status}` });
+      return null; // Handle failure by returning null
     }
+
+    const data = await response.json();
+
+    return data;
   } catch (error) {
-    console.log("Error fetching data", error);
-    return null;
+    setErrors({
+      global: `Error fetching information: ${(error as Error).message}`,
+    });
+    return null; // Return null on error
   }
 }
