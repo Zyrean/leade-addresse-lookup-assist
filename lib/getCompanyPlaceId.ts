@@ -1,7 +1,7 @@
 interface CompanyPlaceId {
+  placeId?: string;
   companyName?: string;
   country?: string;
-  placeId?: string;
 }
 
 export async function getCompanyPlaceId(
@@ -11,12 +11,12 @@ export async function getCompanyPlaceId(
 ): Promise<CompanyPlaceId | null> {
   const errors: Record<string, string> = {};
 
-  if (!companyName.trim()) errors.companyName = "Invalid companyName input";
+  if (!companyName.trim()) errors.companyName = "Invalid company name input";
 
   if (!country.trim()) errors.country = "Invalid country input";
 
   if (Object.keys(errors).length > 0) {
-    setErrors(errors); // Set errors in the state
+    setErrors(errors);
     return null;
   }
 
@@ -28,18 +28,30 @@ export async function getCompanyPlaceId(
       `/api/placeId?companyName=${encodedCompanyName}&country=${encodedCountry}`
     );
 
+    console.log("RESPONSE", response);
+
     if (!response.ok) {
-      setErrors({ global: `Error fetching place ID: ${response.status}` });
-      return null; // Handle failure by returning null
+      setErrors({
+        global: `Error fetching place ID from Company: ${companyName}`,
+      });
+      return null;
     }
 
     const data = await response.json();
+
+    if (data.results[0].place_id === "ChIJYW1Zb-9kjEcRFXvLDxG1Vlw") {
+      setErrors({
+        companyName: `Invalid Company name`,
+      });
+
+      return null;
+    }
 
     return data;
   } catch (error) {
     setErrors({
       global: `Error fetching information: ${(error as Error).message}`,
     });
-    return null; // Return null on error
+    return null;
   }
 }
