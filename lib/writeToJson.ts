@@ -10,9 +10,6 @@ export async function writeToJson(
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ fileName, data }),
     });
-    console.log("ööööööööööööööööööööö");
-
-    console.log(response);
 
     if (response.ok)
       setSuccessMsg({
@@ -25,6 +22,6 @@ export async function writeToJson(
       return null;
     }
   } catch (error) {
-    console.error("❌ Error writing JSON file:", error);
+    console.error("Error writing JSON file:", error);
   }
 }

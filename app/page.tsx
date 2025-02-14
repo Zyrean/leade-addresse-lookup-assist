@@ -5,6 +5,7 @@ import { getPlaceInfos } from "@/lib/getCompanyInfos";
 import { useEffect, useState } from "react";
 import { writeToJson } from "@/lib/writeToJson";
 import getData from "@/lib/getData";
+import getFilteredData from "@/lib/getFilteredData";
 
 export default function Home() {
   const [companyInput, setCompanyInput] = useState<string>("");
@@ -52,7 +53,7 @@ export default function Home() {
   }, [successMsg.Json]);
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-100">
+    <div className="flex justify-center items-center min-h-screen bg-gray-100 flex-col gap-40">
       <div className="mx-auto w-fit flex flex-col gap-2 min-w-96 max-w-96">
         <label htmlFor="company">Company Name</label>
         <input
@@ -151,7 +152,10 @@ export default function Home() {
         {successMsg && <p className="text-green-500 mt-2">{successMsg.Json}</p>}
       </div>
 
-      <button onClick={() => getData()}>Test</button>
+      <div className="flex flex-col gap-4">
+        <button onClick={() => getFilteredData()}>Filter Data</button>
+        <button onClick={() => getData()}>Get final Data</button>
+      </div>
     </div>
   );
 }

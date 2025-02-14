@@ -14,7 +14,6 @@ export async function POST(req: Request) {
       );
     }
 
-    // Define file path in the root directory
     const filePath = path.join(process.cwd(), `${fileName}.json`);
 
     let existingData: any[] = [];
@@ -40,13 +39,10 @@ export async function POST(req: Request) {
       );
     }
 
-    // Append new data
     existingData.push(data);
 
-    // Convert back to JSON format
     const jsonData = JSON.stringify(existingData, null, 2);
 
-    // Write updated data to file
     fs.writeFileSync(filePath, jsonData, "utf8");
 
     return NextResponse.json(

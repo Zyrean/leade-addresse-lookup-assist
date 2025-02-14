@@ -1,3 +1,19 @@
+interface PlaceInfos {
+  placeId?: string | null;
+  businessStatus?: string;
+  phoneNumber?: string;
+  name: string;
+  rating: number;
+  totalRating: number;
+  website: string;
+  streetNumber: string;
+  streetName: string;
+  city: string;
+  kanton: string;
+  country: string;
+  postCode: string;
+}
+
 export async function getPlaceInfos(
   placeId: string | null
 ): Promise<PlaceInfos | null> {
@@ -18,20 +34,25 @@ export async function getPlaceInfos(
 
     console.log("DATA", data);
 
-    const streetNumber = data.address_components[0].long_name || "";
-    const streetName = data.address_components[1].long_name || "";
-    const city = data.address_components[2].long_name || "";
-    const kanton = data.address_components[4].long_name || "";
-    const country = data.address_components[5].long_name || "";
-    const postCode = data.address_components[6].long_name || "";
+    const getComponent = (type: string) =>
+      data.address_components?.find((comp: any) => comp.types.includes(type))
+        ?.long_name || "";
+
+    const streetNumber = getComponent("street_number");
+    const streetName = getComponent("route");
+    const city =
+      getComponent("locality") || getComponent("administrative_area_level_2");
+    const kanton = getComponent("administrative_area_level_1");
+    const country = getComponent("country");
+    const postCode = getComponent("postal_code");
 
     const {
       business_status: businessStatus,
       formatted_phone_number: phoneNumber,
       name,
-      rating,
-      user_ratings_total: totalRating,
-      website,
+      rating = 0,
+      user_ratings_total: totalRating = 0,
+      website = "",
     } = data;
 
     return {
@@ -53,20 +74,4 @@ export async function getPlaceInfos(
     console.error("Error fetching place info:", error);
     return null;
   }
-}
-
-interface PlaceInfos {
-  placeId?: string | null;
-  businessStatus?: string;
-  phoneNumber?: string;
-  name: string;
-  rating: number;
-  totalRating: number;
-  website: string;
-  streetNumber: string;
-  streetName: string;
-  city: string;
-  kanton: string;
-  country: string;
-  postCode: string;
 }

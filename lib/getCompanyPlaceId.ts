@@ -28,8 +28,6 @@ export async function getCompanyPlaceId(
       `/api/placeId?companyName=${encodedCompanyName}&country=${encodedCountry}`
     );
 
-    // console.log("RESPONSE", response);
-
     if (!response.ok) {
       setErrors({
         global: `Error fetching place ID from Company: ${companyName}`,
