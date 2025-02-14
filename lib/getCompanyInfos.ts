@@ -18,12 +18,12 @@ export async function getPlaceInfos(
 
     console.log("DATA", data);
 
-    const streetNumber = data.address_components[0].long_name;
-    const streetName = data.address_components[1].long_name;
-    const city = data.address_components[2].long_name;
-    const kanton = data.address_components[4].long_name;
-    const country = data.address_components[5].long_name;
-    const postCode = data.address_components[6].long_name;
+    const streetNumber = data.address_components[0].long_name || "";
+    const streetName = data.address_components[1].long_name || "";
+    const city = data.address_components[2].long_name || "";
+    const kanton = data.address_components[4].long_name || "";
+    const country = data.address_components[5].long_name || "";
+    const postCode = data.address_components[6].long_name || "";
 
     const {
       business_status: businessStatus,

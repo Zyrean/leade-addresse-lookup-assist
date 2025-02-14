@@ -43,7 +43,6 @@ export async function GET(req: Request): Promise<NextResponse> {
     const data = await response.json();
 
     // if (data.website === "http://www.gov.ch/") {
-    //   console.log("HELLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLop");
 
     //   return NextResponse.json(
     //     { error: "Invalid company name", status: data.status },
@@ -57,9 +56,6 @@ export async function GET(req: Request): Promise<NextResponse> {
         { status: 500 }
       );
     }
-
-    console.log("DATA", data);
-    console.log("TEST");
 
     return NextResponse.json(data, { status: 200 });
   } catch (error) {

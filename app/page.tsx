@@ -4,6 +4,7 @@ import { getCompanyPlaceId } from "@/lib/getCompanyPlaceId";
 import { getPlaceInfos } from "@/lib/getCompanyInfos";
 import { useEffect, useState } from "react";
 import { writeToJson } from "@/lib/writeToJson";
+import getData from "@/lib/getData";
 
 export default function Home() {
   const [companyInput, setCompanyInput] = useState<string>("");
@@ -149,6 +150,8 @@ export default function Home() {
 
         {successMsg && <p className="text-green-500 mt-2">{successMsg.Json}</p>}
       </div>
+
+      <button onClick={() => getData()}>Test</button>
     </div>
   );
 }

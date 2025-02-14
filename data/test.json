@@ -1,0 +1,44 @@
+[
+  {
+    "svit-region": "SVIT Zürich",
+    "membership-type": "Firmenmitglied",
+    "member-svit-mo": "SVIT Zürich",
+    "member-title": "LABSUITE GmbH",
+    "member-name": "Ivan Raffl",
+    "member-street": "Binzstrasse 18",
+    "member-zip-city": "8045 Zürich",
+    "member-phone-biz": null,
+    "member-email": "ivan.raffl@labsuite.ch",
+    "member-website": "www.labsuite.ch",
+    "lat": "47.362793",
+    "lng": "8.515111000000001"
+  },
+  {
+    "svit-region": "SVIT Zürich",
+    "membership-type": "Firmenmitglied",
+    "member-svit-mo": "SVIT Zürich",
+    "member-title": "Casaprima Immobilien AG",
+    "member-name": "Claudia Mamone-Schmidtpeter",
+    "member-street": "Rainstrasse 5",
+    "member-zip-city": "8192 Glattfelden",
+    "member-phone-biz": null,
+    "member-email": "claudia@casaprima.ch",
+    "member-website": "www.engelvoelkers.com",
+    "lat": "47.555589",
+    "lng": "8.507726"
+  },
+  {
+    "svit-region": "SVIT Zürich",
+    "membership-type": "Einzelmitglied",
+    "member-svit-mo": "SVIT Zürich",
+    "member-title": "Robert Künzler",
+    "member-name": null,
+    "member-street": "Heinrichstrasse 219",
+    "member-zip-city": "8005 Zürich",
+    "member-phone-biz": null,
+    "member-email": "robert.kuenzler@svit.ch",
+    "member-website": "www.svit.ch",
+    "lat": "47.388090000000005",
+    "lng": "8.524018"
+  }
+]
