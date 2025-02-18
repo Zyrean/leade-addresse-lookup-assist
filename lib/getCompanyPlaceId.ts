@@ -1,6 +1,7 @@
 interface CompanyPlaceId {
   placeId?: string;
   companyName?: string;
+
   country?: string;
 }
 

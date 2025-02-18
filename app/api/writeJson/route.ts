@@ -5,9 +5,12 @@ import path from "path";
 // Handle POST request to append data to JSON file if not duplicate
 export async function POST(req: Request) {
   try {
-    const { fileName, data } = await req.json(); // Get file name & data
+    const body = await req.json();
+
+    const { fileName, data } = body;
 
     if (!fileName || !data || !data.placeId) {
+      console.error("❌ Missing fileName or placeId:", { fileName, data });
       return NextResponse.json(
         { message: "Missing fileName or placeId" },
         { status: 400 }
@@ -25,6 +28,7 @@ export async function POST(req: Request) {
         existingData = JSON.parse(fileContent);
         if (!Array.isArray(existingData)) existingData = []; // Ensure it's an array
       } catch (error) {
+        console.error("❌ JSON Parsing Error:", error);
         existingData = []; // Reset if JSON is corrupted
       }
     }
@@ -33,6 +37,7 @@ export async function POST(req: Request) {
     const exists = existingData.some((entry) => entry.placeId === data.placeId);
 
     if (exists) {
+      console.warn("⚠️ Place ID already exists:", data.placeId);
       return NextResponse.json(
         { message: "Place ID already exists, not added" },
         { status: 409 }
@@ -41,16 +46,14 @@ export async function POST(req: Request) {
 
     existingData.push(data);
 
-    const jsonData = JSON.stringify(existingData, null, 2);
-
-    fs.writeFileSync(filePath, jsonData, "utf8");
+    fs.writeFileSync(filePath, JSON.stringify(existingData, null, 2), "utf8");
 
     return NextResponse.json(
       { message: "Data appended successfully!" },
       { status: 200 }
     );
   } catch (error) {
-    console.error("Error writing JSON:", error);
+    console.error("❌ Error writing JSON:", error);
     return NextResponse.json(
       { message: "Error writing JSON file" },
       { status: 500 }

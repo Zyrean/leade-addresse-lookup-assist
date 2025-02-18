@@ -11,17 +11,21 @@ export async function writeToJson(
       body: JSON.stringify({ fileName, data }),
     });
 
-    if (response.ok)
+    const responseData = await response.json();
+
+    if (response.ok) {
       setSuccessMsg({
         Json: "Company Successfully added!",
       });
-    else {
+    } else {
       setErrors({
-        Json: `Company already exist on this file `,
+        Json: `Error: ${responseData.message}`,
       });
-      return null;
     }
   } catch (error) {
-    console.error("Error writing JSON file:", error);
+    console.error("❌ Error writing JSON file:", error);
+    setErrors({
+      Json: "An error occurred while writing the file.",
+    });
   }
 }

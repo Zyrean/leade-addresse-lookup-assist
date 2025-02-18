@@ -23,15 +23,10 @@ export async function GET(req: Request): Promise<NextResponse> {
 
   const encodedCompanyName = encodeURIComponent(companyName);
 
-  console.log("---", companyName);
-  console.log("encodedCompanyName", encodedCompanyName);
-
   const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodedCompanyName}&components=country:${country}&key=${key}`;
 
   try {
     const response = await fetch(url);
-
-    console.log("RESPONSE", response);
 
     // if (!response.ok) {
     //   return NextResponse.json(

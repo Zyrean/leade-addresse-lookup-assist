@@ -2,7 +2,7 @@ interface PlaceInfos {
   placeId?: string | null;
   businessStatus?: string;
   phoneNumber?: string;
-  name: string;
+  companyName: string;
   rating: number;
   totalRating: number;
   website: string;
@@ -32,8 +32,6 @@ export async function getPlaceInfos(
 
     const data = await response.json();
 
-    console.log("DATA", data);
-
     const getComponent = (type: string) =>
       data.address_components?.find((comp: any) => comp.types.includes(type))
         ?.long_name || "";
@@ -49,7 +47,7 @@ export async function getPlaceInfos(
     const {
       business_status: businessStatus,
       formatted_phone_number: phoneNumber,
-      name,
+      companyName,
       rating = 0,
       user_ratings_total: totalRating = 0,
       website = "",
@@ -59,7 +57,7 @@ export async function getPlaceInfos(
       placeId,
       businessStatus,
       phoneNumber,
-      name,
+      companyName,
       rating,
       totalRating,
       website,
