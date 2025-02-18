@@ -32,6 +32,8 @@ export async function getPlaceInfos(
 
     const data = await response.json();
 
+    console.log("TEST", data);
+
     const getComponent = (type: string) =>
       data.address_components?.find((comp: any) => comp.types.includes(type))
         ?.long_name || "";
@@ -47,7 +49,7 @@ export async function getPlaceInfos(
     const {
       business_status: businessStatus,
       formatted_phone_number: phoneNumber,
-      companyName,
+      name: companyName,
       rating = 0,
       user_ratings_total: totalRating = 0,
       website = "",
