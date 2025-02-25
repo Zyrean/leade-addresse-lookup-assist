@@ -1,13 +1,14 @@
 interface PlaceInfos {
-  placeId?: string | null;
+  googlePlaceId?: string | null;
   businessStatus?: string;
   phoneNumber?: string;
   companyName: string;
   rating: number;
   totalRating: number;
-  website: string;
-  streetNumber: string;
-  streetName: string;
+  website: string | null;
+  street: string;
+  // streetNumber: string;
+  // streetName: string;
   city: string;
   kanton: string;
   country: string;
@@ -15,15 +16,15 @@ interface PlaceInfos {
 }
 
 export async function getPlaceInfos(
-  placeId: string | null
+  googlePlaceId: string | null
 ): Promise<PlaceInfos | null> {
-  if (!placeId) {
+  if (!googlePlaceId) {
     console.error("Invalid placeId");
     return null;
   }
 
   try {
-    const response = await fetch(`/api/placeInfos?placeId=${placeId}`);
+    const response = await fetch(`/api/placeInfos?placeId=${googlePlaceId}`);
 
     if (!response.ok) {
       console.error("Error fetching place info:", response.status);
@@ -32,14 +33,13 @@ export async function getPlaceInfos(
 
     const data = await response.json();
 
-    console.log("TEST", data);
-
     const getComponent = (type: string) =>
       data.address_components?.find((comp: any) => comp.types.includes(type))
         ?.long_name || "";
 
     const streetNumber = getComponent("street_number");
     const streetName = getComponent("route");
+    const street = `${streetName || ""} ${streetNumber || ""}`.trim();
     const city =
       getComponent("locality") || getComponent("administrative_area_level_2");
     const kanton = getComponent("administrative_area_level_1");
@@ -56,15 +56,14 @@ export async function getPlaceInfos(
     } = data;
 
     return {
-      placeId,
+      googlePlaceId,
       businessStatus,
       phoneNumber,
       companyName,
       rating,
       totalRating,
       website,
-      streetNumber,
-      streetName,
+      street,
       city,
       kanton,
       country,

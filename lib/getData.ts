@@ -1,44 +1,210 @@
 import data from "@/data/test.json"; // ✅ Ensure this import exists
-import { getCompanyPlaceId } from "./getCompanyPlaceId";
+import {
+  getCompanyPlaceId,
+  getMoneyHouseCompanyPlaceId,
+} from "./getCompanyPlaceId";
 import { getPlaceInfos } from "./getCompanyInfos";
 import { writeToJson } from "./writeToJson";
+import { areDomainsEqual, splitStreetAndNumber } from "./helper";
 
 export default async function getData() {
   try {
     const results = await Promise.all(
       data.map(async (company) => {
-        const companyName = company["member-title"];
-
         try {
-          const result = await getCompanyPlaceId(companyName, "CH", () => {});
+          const companyName = company["member-title"];
+
+          const result = await getCompanyPlaceId(companyName, "CH");
+
+          const moneyInfo = await getMoneyHouseCompanyPlaceId(companyName);
+
           if (
             !result ||
             !result.results.length ||
             !result.results[0].place_id
           ) {
             console.warn(`No company found for: ${companyName}`);
-            return null;
+
+            console.log(moneyInfo);
+
+            if (Object.keys(moneyInfo).length === 0) {
+              await writeToJson("testOutput", {
+                ...company,
+                googlePlaceId: null,
+                CompanyNameMoneyHouse: null,
+                moneyHousePlaceId: null,
+                active: null,
+                StreetName: null,
+                streetNumber: null,
+                postCode: null,
+                city: null,
+                businessStatus: null,
+                phoneNumber: null,
+                companyName: null,
+                rating: null,
+                totalRating: null,
+                website: null,
+                kanton: null,
+                country: null,
+                domainValid: false,
+                hasGoogleEntry: false,
+              });
+            }
+
+            if (Object.keys(moneyInfo).length === 1) {
+              const {
+                active,
+                address: { city, street, zip },
+                name: CompanyNameMoneyHouse,
+                uri: moneyHousePlaceId,
+              } = moneyInfo[0];
+
+              const { streetName, streetNumber } = splitStreetAndNumber(street);
+
+              await writeToJson("testOutput", {
+                ...company,
+                googlePlaceId: null,
+                CompanyNameMoneyHouse,
+                moneyHousePlaceId,
+                active,
+                streetName,
+                streetNumber,
+                postCode: zip,
+                city,
+                businessStatus: null,
+                phoneNumber: null,
+                companyName: null,
+                rating: null,
+                totalRating: null,
+                website: null,
+                kanton: null,
+                country: null,
+                domainValid: false,
+                hasGoogleEntry: false,
+              });
+            }
+            if (Object.keys(moneyInfo).length > 1) {
+              const splitMemberZip = company["member-zip-city"]
+                .split(" ")
+                .shift();
+
+              console.log("splitMemberZip", splitMemberZip);
+
+              const foundItem = moneyInfo.find((item) => {
+                return item.address.zip === splitMemberZip;
+              });
+
+              console.log(foundItem);
+
+              const {
+                active,
+                address: { city, street, zip },
+                name: CompanyNameMoneyHouse,
+                uri: moneyHousePlaceId,
+              } = foundItem;
+
+              const { streetName, streetNumber } = splitStreetAndNumber(street);
+
+              await writeToJson("testOutput", {
+                ...company,
+                googlePlaceId: null,
+                CompanyNameMoneyHouse,
+                moneyHousePlaceId,
+                active,
+                streetName,
+                streetNumber,
+                postCode: zip,
+                city,
+                businessStatus: null,
+                phoneNumber: null,
+                companyName: null,
+                rating: null,
+                totalRating: null,
+                website: null,
+                kanton: null,
+                country: null,
+                domainValid: false,
+                hasGoogleEntry: false,
+              });
+            }
+          } else {
+            const googlePlaceId = result?.results[0].place_id;
+            const placeInfo = await getPlaceInfos(googlePlaceId);
+
+            if (!placeInfo) {
+              console.warn(`⚠️ No place info found for: ${companyName}`);
+              return null;
+            }
+
+            const valid = areDomainsEqual(
+              company["member-email"],
+              company["member-website"],
+              placeInfo.website
+            );
+
+            if (Object.keys(moneyInfo).length === 0) {
+              await writeToJson("testOutput", {
+                ...company,
+                ...placeInfo,
+                googlePlaceId: null,
+                CompanyNameMoneyHouse: null,
+                moneyHousePlaceId: null,
+                active: null,
+                // street: null,
+                postCode: null,
+                city: null,
+                businessStatus: null,
+                phoneNumber: null,
+                companyName: null,
+                rating: null,
+                totalRating: null,
+                website: null,
+                kanton: null,
+                country: null,
+                domainValid: valid,
+                hasGoogleEntry: false,
+              });
+            } else {
+              const {
+                active,
+                address: { city, street, zip },
+                name: CompanyNameMoneyHouse,
+                uri: moneyHousePlaceId,
+              } = moneyInfo[0];
+
+              await writeToJson("testOutput", {
+                ...company,
+                ...placeInfo,
+                googlePlaceId,
+                CompanyNameMoneyHouse,
+                moneyHousePlaceId,
+                active,
+                street,
+                postCode: zip,
+                city,
+                businessStatus: null,
+                phoneNumber: null,
+                companyName: null,
+                rating: null,
+                totalRating: null,
+                website: null,
+                kanton: null,
+                country: null,
+                domainValid: false,
+                hasGoogleEntry: false,
+              });
+            }
+
+            return { ...company, valid, hasGoogleEntry: true };
           }
-
-          const placeId = result.results[0].place_id;
-          const placeInfo = await getPlaceInfos(placeId);
-
-          // Send each company data one by one
-          await writeToJson(
-            "testOutput",
-            { ...company, ...placeInfo },
-            () => {},
-            () => {}
-          );
-
-          return { company, placeInfo };
         } catch (error) {
-          console.error(`Error fetching data for ${companyName}:`, error);
+          console.error(`❌ Fehler für ${company["member-title"]}:`, error);
           return null;
         }
       })
     );
 
+    console.log("Total companies processed:", results.filter(Boolean).length);
     return results.filter(Boolean);
   } catch (error) {
     console.error("Unexpected error in getData:", error);

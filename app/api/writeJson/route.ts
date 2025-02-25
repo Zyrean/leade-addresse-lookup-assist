@@ -1,55 +1,46 @@
 import { NextResponse } from "next/server";
-import fs from "fs";
+import fs from "fs/promises";
 import path from "path";
 
-// Handle POST request to append data to JSON file if not duplicate
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-
     const { fileName, data } = body;
-
-    if (!fileName || !data || !data.placeId) {
-      console.error("❌ Missing fileName or placeId:", { fileName, data });
-      return NextResponse.json(
-        { message: "Missing fileName or placeId" },
-        { status: 400 }
-      );
-    }
 
     const filePath = path.join(process.cwd(), `${fileName}.json`);
 
     let existingData: any[] = [];
 
-    // Check if the file exists
-    if (fs.existsSync(filePath)) {
-      const fileContent = fs.readFileSync(filePath, "utf8");
-      try {
+    try {
+      // Read the existing file content
+      const fileContent = await fs.readFile(filePath, "utf8");
+
+      // Check if the file content is non-empty and valid JSON
+      if (fileContent.trim()) {
         existingData = JSON.parse(fileContent);
-        if (!Array.isArray(existingData)) existingData = []; // Ensure it's an array
-      } catch (error) {
-        console.error("❌ JSON Parsing Error:", error);
-        existingData = []; // Reset if JSON is corrupted
+
+        if (!Array.isArray(existingData)) {
+          existingData = []; // Ensure it's an array if it's not
+        }
       }
+    } catch (error) {
+      // If the file doesn't exist or error reading/parsing, initialize with an empty array
+      console.warn("⚠️ File not found or error reading file:", error);
+      existingData = [];
     }
 
-    // Check if placeId already exists
-    const exists = existingData.some((entry) => entry.placeId === data.placeId);
-
-    if (exists) {
-      console.warn("⚠️ Place ID already exists:", data.placeId);
-      return NextResponse.json(
-        { message: "Place ID already exists, not added" },
-        { status: 409 }
-      );
+    // Loop through the data and add it to the existing array
+    if (Array.isArray(data)) {
+      existingData.push(...data); // Spread to add multiple objects if `data` is an array
+    } else {
+      existingData.push(data); // If `data` is a single object, add it directly
     }
 
-    existingData.push(data);
-
-    fs.writeFileSync(filePath, JSON.stringify(existingData, null, 2), "utf8");
+    // Write the updated data back to the file
+    await fs.writeFile(filePath, JSON.stringify(existingData, null, 2), "utf8");
 
     return NextResponse.json(
-      { message: "Data appended successfully!" },
+      { message: "✅ Data added successfully!" },
       { status: 200 }
     );
   } catch (error) {
