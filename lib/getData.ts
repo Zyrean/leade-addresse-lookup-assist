@@ -34,6 +34,7 @@ export default async function getData() {
                 CompanyNameMoneyHouse: null,
                 moneyHousePlaceId: null,
                 active: null,
+                moneyHouseUri:null,
                 StreetName: null,
                 streetNumber: null,
                 postCode: null,
@@ -56,7 +57,7 @@ export default async function getData() {
                 active,
                 address: { city, street, zip },
                 name: CompanyNameMoneyHouse,
-                uri: moneyHousePlaceId,
+                uri: moneyHouseUri,
               } = moneyInfo[0];
 
               const { streetName, streetNumber } = splitStreetAndNumber(street);
@@ -65,7 +66,7 @@ export default async function getData() {
                 ...company,
                 googlePlaceId: null,
                 CompanyNameMoneyHouse,
-                moneyHousePlaceId,
+                moneyHouseUri,
                 active,
                 streetName,
                 streetNumber,
@@ -100,7 +101,7 @@ export default async function getData() {
                 active,
                 address: { city, street, zip },
                 name: CompanyNameMoneyHouse,
-                uri: moneyHousePlaceId,
+                uri: moneyHouseUri,
               } = foundItem;
 
               const { streetName, streetNumber } = splitStreetAndNumber(street);
@@ -109,7 +110,7 @@ export default async function getData() {
                 ...company,
                 googlePlaceId: null,
                 CompanyNameMoneyHouse,
-                moneyHousePlaceId,
+                moneyHouseUri,
                 active,
                 streetName,
                 streetNumber,
